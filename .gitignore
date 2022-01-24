@@ -1,0 +1,6 @@
+*.o
+buildScript
+AnimDemo
+*.cbp
+*.layout
+*.depend
