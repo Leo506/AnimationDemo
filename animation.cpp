@@ -4,45 +4,107 @@
 
 namespace animation
 {
-	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect) : m_lostTime(0), m_current(0)
+	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0)
 	{
-		for (int i = 0; i < 6; i++)
-		{
-			m_sprite[i] = new sf::Texture;
+		m_numberOfSprites = countOfSprites;
 
+		// Загрузка текстур
+		for (int i = 0; i < countOfSprites; i++)
+		{
+			// Создание новой текстуры
+			m_textures.push_back(new sf::Texture);
+
+			// Характеристка текстуры
 			sf::IntRect spriteRect(0 + i * rect.width, 0, rect.width, rect.height);
-			if (!m_sprite[i]->loadFromFile(path, spriteRect))
+			if (!m_textures[i]->loadFromFile(path, spriteRect))
 			{
 				std::cout << "Error on loading sprite\n";
-				break;
+				std::exit(-3);
 			}
 		}
+
+		// Анимируемый спрайт в m_currentSprite
 		m_currentSprite = sprite;
-		m_currentSprite->setScale(3.0f, 3.0f);
-		m_currentSprite->setPosition(400 - m_currentSprite->getGlobalBounds().width / 2, 300 - m_currentSprite->getGlobalBounds().height / 2);
-		m_currentSprite->setTexture(*m_sprite[m_current]);
+
+		// Установка текстуры
+		m_currentSprite->setTexture(*m_textures[m_current]);
+
+		std::cout << "Animation clip is created\n";
 	}
+
+
+	AnimationClip::AnimationClip(const AnimationClip& animClip)
+	{
+		m_numberOfSprites = animClip.m_numberOfSprites;
+		m_current = animClip.m_current;
+		m_lostTime = animClip.m_lostTime;
+
+		for (int i = 0; i < m_numberOfSprites; i++)
+			m_textures.push_back(new sf::Texture(*animClip.m_textures[i]));
+
+		for (int i = 0; i < m_numberOfSprites; i++)
+			m_animTimes.push_back(animClip.m_animTimes[i]);
+	}
+
+
+	AnimationClip& AnimationClip::operator=(const AnimationClip& animClip)
+	{
+		if (this == & animClip)
+			return *this;
+
+		m_numberOfSprites = animClip.m_numberOfSprites;
+		m_current = animClip.m_current;
+		m_lostTime = animClip.m_lostTime;
+
+		m_textures.clear();
+		for (int i = 0; i < m_numberOfSprites; i++)
+			m_textures.push_back(new sf::Texture(*animClip.m_textures[i]));
+
+		m_animTimes.clear();
+		for (int i = 0; i < m_numberOfSprites; i++)
+			m_animTimes.push_back(animClip.m_animTimes[i]);
+
+		return *this;
+	}
+
+
+	bool AnimationClip::SetAnimTime(long int time, int index)
+	{
+		std::cout << "Index: " << index << " Value: " << time << std::endl;
+		if (index < 0 || index >= m_numberOfSprites)
+			return false;
+
+		m_animTimes.insert(m_animTimes.begin() + index, time);
+		std::cout << "Anim time " << time << " set in position by " << index << " index\n";
+		return true;
+	}
+
 
 	void AnimationClip::Update(int delta)
 	{
-		m_lostTime += delta;
-		if (m_lostTime >= m_times[m_current])
+		if (m_animTimes.size() != 0)
 		{
-			m_current++;
-			if (m_current >= 6)
+
+			m_lostTime += delta;
+			if (m_lostTime >= m_animTimes[m_current])
 			{
-				m_current = 0;
-				m_lostTime = 0;
+				m_current++;
+				if (m_current >= 6)
+				{
+					m_current = 0;
+					m_lostTime = 0;
+				}
+
+				m_currentSprite->setTexture(*m_textures[m_current]);
+				std::cout << "Current sprite index: " << m_current << std::endl;
 			}
-			std::cout << m_current << std::endl;
-			m_currentSprite->setTexture(*m_sprite[m_current]);
 		}
-		std::cout << "lost time: " << m_lostTime << std::endl;
 	}
+
 
 	AnimationClip::~AnimationClip()
 	{
-		for (int i = 0; i < 3; i++)
-			delete m_sprite[i];
+		for (int i = 0; i < m_numberOfSprites; i++)
+			delete m_textures[i];
 	}
 }

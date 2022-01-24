@@ -2,21 +2,33 @@
 #define ANIMATION_H_
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 namespace animation
 {
 	class AnimationClip
 	{
 	private:
-		sf::Texture* m_sprite[6];                       // Спрайты анимации
-		sf::Sprite* m_currentSprite;                   // Текущий спрайт
+		std::vector<sf::Texture*> m_textures;          // Спрайты (текстуры) анимации
+		sf::Sprite* m_currentSprite;                   // Анимируемый спрайт
 		long int m_lostTime;                           // Прошедшее время
-		int m_current;                                 // Текущий спрайт
-		long int m_times[6]={83, 166, 249, 332, 410, 498};        // Время смены спрайтов
+		int m_current;                                 // Индекс текущей текстуры
+		std::vector<long int> m_animTimes;             // Время смены спрайтов
+		int m_numberOfSprites;                         // Количество спрайтов в анимации
 
 	public:
-		AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect);
+
+		// Конструктор
+		// path - путь к файлу со спрайтами
+		// sprite - анимируемый спрайт
+		// rect - характеристика первого спрайта в наборе (координаты верхнего левого угла, ширина и высота)
+		// countsOfSprites - кол-во спрайтов в анимации
+		AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites);
+		AnimationClip(const AnimationClip& animClip);
+		AnimationClip& operator=(const AnimationClip& animClip);
 		~AnimationClip();
+
+		bool SetAnimTime(long int time, int index);  // Установка времени смены спрайтов
 		void Update(int delta);
 	};
 }
