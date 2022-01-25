@@ -15,6 +15,9 @@ namespace animation
 		int m_current;                                 // Индекс текущей текстуры
 		std::vector<long int> m_animTimes;             // Время смены спрайтов
 		int m_numberOfSprites;                         // Количество спрайтов в анимации
+		float m_animSpeed;                             // Скорость анимации
+
+		void UpdateAnimTimes();                        // Обновляет время смены анимации при изменении скорости
 
 	public:
 
@@ -24,11 +27,39 @@ namespace animation
 		// rect - характеристика первого спрайта в наборе (координаты верхнего левого угла, ширина и высота)
 		// countsOfSprites - кол-во спрайтов в анимации
 		AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites);
+
+		// Конструктор по-умолчанию
+		AnimationClip(sf::Sprite* sprite);
+
+		// Конструктор копирования
 		AnimationClip(const AnimationClip& animClip);
+
+		// Оператор присваивания
 		AnimationClip& operator=(const AnimationClip& animClip);
+
+		// Деструктор
 		~AnimationClip();
 
-		bool SetAnimTime(long int time, int index);  // Установка времени смены спрайтов
+		// Установка времени смены спрайтов
+		// time - время смены в миллисекундах после начала анимации
+		// index - индекс времени (порядковый номер)
+		bool SetAnimTime(long int time, int index);
+
+		// Установка текстуры спрайта
+		// texture - ссылка на текстуру
+		// index - индекс текстуры (порядковый номер)
+		bool SetTexture(sf::Texture& texture, int index);
+
+		// Устанавливает кол-во спрайтов в анимации
+		void SetNumberOfSprites(int value) { m_numberOfSprites = value; }
+
+		// Установка скорости анимации
+		void SetAnimSpeed(float speed) { m_animSpeed = speed; UpdateAnimTimes();}
+
+		// Возвращает кол-во спрайтов в анимации
+		const int NumberOfSprites() const { return m_numberOfSprites; }
+
+		// Обновить анимацию
 		void Update(int delta);
 	};
 }

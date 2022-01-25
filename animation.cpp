@@ -4,7 +4,7 @@
 
 namespace animation
 {
-	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0)
+	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0), m_animSpeed(1)
 	{
 		m_numberOfSprites = countOfSprites;
 
@@ -33,15 +33,30 @@ namespace animation
 	}
 
 
+	// Конструктор по умолчанию
+	// Устанавливает все члены класса в дефолтные значения
+	AnimationClip::AnimationClip(sf::Sprite* sprite)
+	{
+		m_lostTime = 0;
+		m_current = 0;
+		m_numberOfSprites = 0;
+		m_animSpeed = 1;
+		m_currentSprite = sprite;
+	}
+
+
 	AnimationClip::AnimationClip(const AnimationClip& animClip)
 	{
+		// Копирование обычных членов класса
 		m_numberOfSprites = animClip.m_numberOfSprites;
 		m_current = animClip.m_current;
 		m_lostTime = animClip.m_lostTime;
 
+		// Копирование загруженных текстур
 		for (int i = 0; i < m_numberOfSprites; i++)
 			m_textures.push_back(new sf::Texture(*animClip.m_textures[i]));
 
+		// Копирование
 		for (int i = 0; i < m_numberOfSprites; i++)
 			m_animTimes.push_back(animClip.m_animTimes[i]);
 	}
@@ -49,17 +64,25 @@ namespace animation
 
 	AnimationClip& AnimationClip::operator=(const AnimationClip& animClip)
 	{
+		// Проверяем на присваивание самому себе
 		if (this == & animClip)
 			return *this;
 
+		// Копируем обычные члены класса
 		m_numberOfSprites = animClip.m_numberOfSprites;
 		m_current = animClip.m_current;
 		m_lostTime = animClip.m_lostTime;
 
-		m_textures.clear();
+		// Чистим уже загруженные текстуры
+		for (int i = 0; i < m_textures.size(); i++)
+			delete m_textures[i];
+
+		// Копирование загруженных текстур
 		for (int i = 0; i < m_numberOfSprites; i++)
 			m_textures.push_back(new sf::Texture(*animClip.m_textures[i]));
 
+		// Сбрасываем вектор m_animTimes
+		// и копируем в него новые значения
 		m_animTimes.clear();
 		for (int i = 0; i < m_numberOfSprites; i++)
 			m_animTimes.push_back(animClip.m_animTimes[i]);
@@ -70,13 +93,31 @@ namespace animation
 
 	bool AnimationClip::SetAnimTime(long int time, int index)
 	{
-		std::cout << "Index: " << index << " Value: " << time << std::endl;
+		// Проверка на корректность индекса
 		if (index < 0 || index >= m_numberOfSprites)
 			return false;
 
 		m_animTimes.insert(m_animTimes.begin() + index, time);
-		std::cout << "Anim time " << time << " set in position by " << index << " index\n";
 		return true;
+	}
+
+
+	bool AnimationClip::SetTexture(sf::Texture& texture, int index)
+	{
+		if (index < 0 || index >= m_numberOfSprites)
+			return false;
+
+		m_textures.insert(m_textures.begin() + index, new sf::Texture(texture));
+		return true;
+	}
+
+
+	void AnimationClip::UpdateAnimTimes()
+	{
+		for (int i = 0; i < m_animTimes.size(); i++)
+		{
+			m_animTimes[i] /= m_animSpeed;
+		}
 	}
 
 
@@ -89,14 +130,13 @@ namespace animation
 			if (m_lostTime >= m_animTimes[m_current])
 			{
 				m_current++;
-				if (m_current >= 6)
+				if (m_current >= m_numberOfSprites)
 				{
 					m_current = 0;
 					m_lostTime = 0;
 				}
 
 				m_currentSprite->setTexture(*m_textures[m_current]);
-				std::cout << "Current sprite index: " << m_current << std::endl;
 			}
 		}
 	}
