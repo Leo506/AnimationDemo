@@ -4,7 +4,7 @@
 
 namespace animation
 {
-	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0), m_animSpeed(1)
+	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0), m_animSpeed(1), m_pause(false)
 	{
 		m_numberOfSprites = countOfSprites;
 
@@ -42,6 +42,7 @@ namespace animation
 		m_numberOfSprites = 0;
 		m_animSpeed = 1;
 		m_currentSprite = sprite;
+		m_pause = false;
 	}
 
 
@@ -123,11 +124,11 @@ namespace animation
 
 	void AnimationClip::Update(int delta)
 	{
-		if (m_animTimes.size() != 0)
+		if (m_animTimes.size() != 0 && !m_pause)
 		{
 
 			m_lostTime += delta;
-			if (m_lostTime >= m_animTimes[m_current])
+			if (m_lostTime >= m_animTimes[m_current] / m_animSpeed)
 			{
 				m_current++;
 				if (m_current >= m_numberOfSprites)

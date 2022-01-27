@@ -3,13 +3,18 @@
 #include <SFML/System/Time.hpp>
 #include <SFML/System/Clock.hpp>
 #include "animation.h"
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(800, 600), "AnimationDemo");
+	ImGui::SFML::Init(window);
 
-	sf::Sprite sprite1, sprite2;  // Два спрайта для отображения
+	float speed = 1;
+
+	sf::Sprite sprite1;
 
 	// Создание анимации 1-ым способом
 	sf::IntRect rect1(0, 0, 32, 32);
@@ -18,23 +23,9 @@ int main()
 		clip1.SetAnimTime(70 * (i+1), i);
 	clip1.SetAnimSpeed(2);
 
-	// Создание анимации 2-ым способом
-	animation::AnimationClip clip2(&sprite2);
-	clip2.SetNumberOfSprites(4);
-	sf::Texture texture;
-	for (int i = 0;  i < 4; i++)
-	{
-		sf::IntRect rect2(0 + 32 * i, 32, 32, 32);
-		texture.loadFromFile("Assets/Sprites/2.png", rect2);
-		clip2.SetTexture(texture, i);
-		clip2.SetAnimTime(70 * (i + 1), i);
-	}
-
 	sprite1.setScale(3.0f, 3.0f);
-	sprite2.setScale(3.0f, 3.0f);
 
 	sprite1.setPosition(100, 252);
-	sprite2.setPosition(604, 252);
 
 	sf::Clock deltaClock;
 	while (window.isOpen())
@@ -42,20 +33,37 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
+        	ImGui::SFML::ProcessEvent(event);
             if (event.type == sf::Event::Closed)
                 window.close();
         }
 
+        sf::Time dt = deltaClock.restart();
+
+        ImGui::SFML::Update(window, dt);
+
+        ImGui::Begin("Animation Controller");
+
+        ImGui::Text("Speed of animation");
+        ImGui::SliderFloat("speed", &speed, 0.0f, 5.0f);
+        if (ImGui::Button("Set speed"))
+			clip1.SetAnimSpeed(speed);
+		if (ImGui::Button("Pause"))
+			clip1.Pause(true);
+		if (ImGui::Button("Unpause"))
+			clip1.Pause(false);
+		ImGui::End();
+
+        clip1.Update(dt.asMilliseconds());
+
         window.clear();
         window.draw(sprite1);
-        window.draw(sprite2);
+        ImGui::SFML::Render(window);
         window.display();
 
-        sf::Time dt = deltaClock.restart();
-        clip1.Update(dt.asMilliseconds());
-        clip2.Update(dt.asMilliseconds());
-
     }
+
+    ImGui::SFML::Shutdown();
 
     return 0;
 }

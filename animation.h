@@ -16,6 +16,7 @@ namespace animation
 		std::vector<long int> m_animTimes;             // Время смены спрайтов
 		int m_numberOfSprites;                         // Количество спрайтов в анимации
 		float m_animSpeed;                             // Скорость анимации
+		bool m_pause;                                  // Состояние анимации (на паузе или нет)
 
 		void UpdateAnimTimes();                        // Обновляет время смены анимации при изменении скорости
 
@@ -54,13 +55,16 @@ namespace animation
 		void SetNumberOfSprites(int value) { m_numberOfSprites = value; }
 
 		// Установка скорости анимации
-		void SetAnimSpeed(float speed) { m_animSpeed = speed; UpdateAnimTimes();}
+		void SetAnimSpeed(float speed) { m_animSpeed = speed; }
 
 		// Возвращает кол-во спрайтов в анимации
 		const int NumberOfSprites() const { return m_numberOfSprites; }
 
 		// Обновить анимацию
 		void Update(int delta);
+
+		// Пауза анимации
+		void Pause(bool pause) { m_pause = pause; }
 	};
 }
 

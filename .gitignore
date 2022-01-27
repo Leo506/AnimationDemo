@@ -4,3 +4,5 @@ AnimDemo
 *.cbp
 *.layout
 *.depend
+obj/
+bin/
