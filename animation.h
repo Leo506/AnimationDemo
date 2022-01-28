@@ -60,6 +60,9 @@ namespace animation
 		// Возвращает кол-во спрайтов в анимации
 		const int NumberOfSprites() const { return m_numberOfSprites; }
 
+		// Возвращает скорость анимации
+		const float AnimSpeed() const { return m_animSpeed; }
+
 		// Обновить анимацию
 		void Update(int delta);
 
