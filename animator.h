@@ -12,10 +12,10 @@ namespace animation
 		sf::RenderWindow *m_window;  // Игровое окно, к которому будет привязан UI инструмента
 		AnimationClip *m_clip;       // Анимация, над которой ведётся работа
 		float m_speed;               // Скорость анимации
-		std::string m_path;          // Путь к файлу со спрайтами
 		sf::IntRect m_rect;          // Размеры и координаты первого спрайта
 		int m_countOfSprites;        // Кол-во спрайтов в анимации
 		bool m_animationIsSet;       // Установлена ли анимация?
+		bool m_loop;
 
 	public:
 		// Конструктор аниматора

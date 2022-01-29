@@ -4,7 +4,7 @@
 
 namespace animation
 {
-	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0), m_animSpeed(1), m_pause(false)
+	AnimationClip::AnimationClip(std::string path, sf::Sprite* sprite, sf::IntRect& rect, int countOfSprites) : m_lostTime(0), m_current(0), m_animSpeed(1), m_pause(false), m_looped(true)
 	{
 		m_numberOfSprites = countOfSprites;
 
@@ -43,6 +43,7 @@ namespace animation
 		m_animSpeed = 1;
 		m_currentSprite = sprite;
 		m_pause = false;
+		m_looped = true;
 	}
 
 
@@ -52,6 +53,7 @@ namespace animation
 		m_numberOfSprites = animClip.m_numberOfSprites;
 		m_current = animClip.m_current;
 		m_lostTime = animClip.m_lostTime;
+		m_looped = animClip.m_looped;
 
 		// Копирование загруженных текстур
 		for (int i = 0; i < m_numberOfSprites; i++)
@@ -73,6 +75,7 @@ namespace animation
 		m_numberOfSprites = animClip.m_numberOfSprites;
 		m_current = animClip.m_current;
 		m_lostTime = animClip.m_lostTime;
+		m_looped = animClip.m_looped;
 
 		// Чистим уже загруженные текстуры
 		for (int i = 0; i < m_textures.size(); i++)
@@ -126,18 +129,25 @@ namespace animation
 	{
 		if (m_animTimes.size() != 0 && !m_pause)
 		{
-
-			m_lostTime += delta;
-			if (m_lostTime >= m_animTimes[m_current] / m_animSpeed)
+			if (m_current < m_numberOfSprites)
 			{
-				m_current++;
-				if (m_current >= m_numberOfSprites)
+				m_lostTime += delta;
+				if (m_lostTime >= m_animTimes[m_current] / m_animSpeed)
 				{
-					m_current = 0;
-					m_lostTime = 0;
-				}
+					m_current++;
+					if (m_current >= m_numberOfSprites)
+					{
+						if (m_looped)
+						{
+							m_current = 0;
+							m_lostTime = 0;
+						} else
+							return;
 
-				m_currentSprite->setTexture(*m_textures[m_current]);
+					}
+
+					m_currentSprite->setTexture(*m_textures[m_current]);
+				}
 			}
 		}
 	}

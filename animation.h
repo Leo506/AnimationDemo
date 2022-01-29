@@ -17,6 +17,7 @@ namespace animation
 		int m_numberOfSprites;                         // Количество спрайтов в анимации
 		float m_animSpeed;                             // Скорость анимации
 		bool m_pause;                                  // Состояние анимации (на паузе или нет)
+		bool m_looped;                                 // Зацикливать анимацию?
 
 		void UpdateAnimTimes();                        // Обновляет время смены анимации при изменении скорости
 
@@ -68,6 +69,14 @@ namespace animation
 
 		// Пауза анимации
 		void Pause(bool pause) { m_pause = pause; }
+
+		// Получение текущего спрайта
+		const sf::Texture* GetTexture(int index) const { return m_textures[index]; }
+
+		void SetLoop(bool loop) { m_looped = loop; }
+
+		void Restart() { m_current = 0; m_lostTime = 0; }
+
 	};
 }
 
