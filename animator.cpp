@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include "animator.h"
+#include <cstring>
 
 namespace animation
 {
@@ -11,7 +12,6 @@ namespace animation
 		m_clip  = clip;
 		m_animationIsSet = true;
 		m_speed = clip->AnimSpeed();
-		m_path = "";
 		m_rect = sf::IntRect(0,0,0,0);
 		m_countOfSprites = clip->NumberOfSprites();
 		ImGui::SFML::Init(*m_window);
@@ -23,7 +23,6 @@ namespace animation
 		m_clip = NULL;
 		m_animationIsSet = false;
 		m_speed = 0;
-		m_path = "";
 		m_rect = sf::IntRect(0,0,0,0);
 		m_countOfSprites = 0;
 		ImGui::SFML::Init(*m_window);
@@ -50,7 +49,6 @@ namespace animation
 		m_clip = clip;
 		m_animationIsSet = true;
 		m_speed = clip->AnimSpeed();
-		m_path = "";
 		m_rect = sf::IntRect(0,0,0,0);
 		m_countOfSprites = clip->NumberOfSprites();
 		ImGui::SFML::Init(*m_window);
@@ -68,11 +66,20 @@ namespace animation
 			if (ImGui::DragFloat("Speed", &m_speed, 0.1f, 0.0f, 5.0f))
 				m_clip->SetAnimSpeed(m_speed);
 
+			if (ImGui::Button("Start"))
+				m_clip->Restart();
+			ImGui::SameLine();
+
 			if (ImGui::Button("Pause"))
 				m_clip->Pause(true);
 
+			ImGui::SameLine();
 			if (ImGui::Button("Unpause"))
 				m_clip->Pause(false);
+
+			static bool loop = true;
+			if (ImGui::Checkbox("Loop", &loop))
+				m_clip->SetLoop(loop);
 
 			ImGui::End();
 		}
